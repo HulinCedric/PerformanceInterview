@@ -24,9 +24,7 @@ public class RollerCoasterShould
             .Should()
             .Be(totalDirhamsEarned);
 
-    [Theory(
-        Skip = "Remove Skip attribute and work on performance optimisation",
-        DisplayName = "Execution time < 500ms")]
+    [Theory(DisplayName = "Execution time < 500ms")]
     [ClassData(typeof(RollerCoasterTheoryData.SampleDataset))]
     [ClassData(typeof(RollerCoasterTheoryData.LargeDataset))]
     public void Performed_under_500ms(
@@ -46,16 +44,27 @@ public class RollerCoasterShould
     {
         var groupsCount = personsGroupsCount.Length;
 
+        var rideResultsByQueuePosition = new Dictionary<int, RideResult>();
         var totalDirhamsEarned = 0L;
         var queuePosition = 0;
 
         for (var i = 0; i < attractionRidesCount; i++)
         {
-            var rideResult = GetDirhamsEarnedAndNewQueuePositionForARide(
-                groupsCount,
-                personsGroupsCount,
-                queuePosition,
-                attractionPlacesCount);
+            RideResult rideResult;
+            if (rideResultsByQueuePosition.ContainsKey(queuePosition))
+            {
+                rideResult = rideResultsByQueuePosition[queuePosition];
+            }
+            else
+            {
+                rideResult = GetDirhamsEarnedAndNewQueuePositionForARide(
+                    groupsCount,
+                    personsGroupsCount,
+                    queuePosition,
+                    attractionPlacesCount);
+                
+                rideResultsByQueuePosition.Add(queuePosition, rideResult);
+            }
 
 
             totalDirhamsEarned += rideResult.DirhamsEarned;
